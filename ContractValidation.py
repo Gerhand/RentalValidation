@@ -19,8 +19,14 @@ read_file_Att.to_excel (r'C:\\Users\\Gert\\Documents\\Development\\excellekes\\f
 
 path1 = 'FileBucket\\MAC.xlsx'
 path2 = 'FileBucket\\ATT.xlsx'
-pathdest = 'FileBucket\\RentalContract.xlsx'
-pathtest = 'FileBucket\\test.xlsx'
+pathdest = 'FileBucket\\RentalContract1.xlsx'
+#pathtest = 'FileBucket\\test.xlsx'
+#pathtest2 = 'FileBucket\\test2.xlsx'
+#pathtestdest = 'FileBucket\\dest.xlsx'
+
+test1 = 'C:\\Users\\Gert\\Documents\\Development\\excellekes\\1.xlsx'
+test2 = 'C:\\Users\\Gert\\Documents\\Development\\excellekes\\2.xlsx'
+testdest = 'C:\\Users\\Gert\\Documents\\Development\\excellekes\\dest.xlsx'
 
 
 machAttsheetTitle = 'Machines + Attachments'
@@ -45,7 +51,13 @@ valcol_d = 'CountryISO2'
 valcol_h = 'Purpose'
 
 
+
+
+
 ValidationRegime = int(input('What kind of validation do you want? 1 = Full, 2 = Combining and validation, 3 = File Validation only\n'))
+
+
+startGlobalTimer = time.perf_counter()
 
 if ValidationRegime == 1:
 	print('Start Preparing Machine and Attachment data', flush=True)
@@ -57,91 +69,171 @@ if ValidationRegime == 1:
 	vf.combiningWorkbooks(machAttsheetTitle, pathdest, path1, path2)
 
 
+	#Loading
+
+	startLoadingTimer = time.perf_counter()
+	print('Starting to load', flush=True)
 	wb = load_workbook(filename=pathdest)
 	wbs0 = wb.worksheets[0]
 
 	wbs0.auto_filter.ref = wbs0.dimensions
-	wbs0.freeze_panes = 'A2' 
+	wbs0.freeze_panes = 'A2'
+
+	finishLoadingTimer = time.perf_counter()
+	print(f'Loading finished in {round(finishLoadingTimer-startLoadingTimer, 3)} seconds', flush=True)
+
+
+
+	#Comparing
+
 
 	print('Comparing data', flush=True)
+	startCompareTimer = time.perf_counter()
+
 	vf.vlookupToLastCollumn(wbs0, 'Purpose', machAttsheetTitle, Purpose)
 	vf.vlookupToLastCollumn(wbs0, 'State', machAttsheetTitle, State)
 	vf.vlookupToLastCollumn(wbs0, 'ObjectType', machAttsheetTitle, ObjectType)
 	vf.vlookupToLastCollumn(wbs0, 'InFleetEndDate', machAttsheetTitle, InFleetEndDate)
 
-	wb.save(pathdest)
+	finishCompareTimer = time.perf_counter()
+	print(f'Loading finished in {round(finishCompareTimer-startCompareTimer, 3)} seconds', flush=True)
 
 
-elif ValidationRegime == 2:
-	vf.combiningWorkbooks(machAttsheetTitle, pathdest, path1, path2)
-
-
-	wb = load_workbook(filename=pathdest)
-	wbs0 = wb.worksheets[0]
-
-	wbs0.auto_filter.ref = wbs0.dimensions
-	wbs0.freeze_panes = 'A2' 
-
-	print('Comparing data', flush=True)
-	vf.vlookupToLastCollumn(wbs0, 'Purpose', machAttsheetTitle, Purpose)
-	vf.vlookupToLastCollumn(wbs0, 'State', machAttsheetTitle, State)
-	vf.vlookupToLastCollumn(wbs0, 'ObjectType', machAttsheetTitle, ObjectType)
-	vf.vlookupToLastCollumn(wbs0, 'InFleetEndDate', machAttsheetTitle, InFleetEndDate)
-	wb.save(pathdest)
-
+	#Validating
 
 	print('Validating', flush=True)
+	startValidatingTimer = time.perf_counter()
 
 	vf.searchForBlanks(wb, wbs0, valcol_a)
 	vf.searchForBlanks(wb, wbs0, valcol_b)
 	vf.searchForBlanks(wb, wbs0, valcol_c)
 	vf.searchForBlanks(wb, wbs0, valcol_d)
-	vf.searchForBlanks(wb, wbs0, valcol_e)
+	#vf.searchForBlanks(wb, wbs0, valcol_h)
+
+	finishValidatingTimer = time.perf_counter()
+	print(f'Validating finished in {round(finishValidatingTimer-startValidatingTimer, 3)} seconds', flush=True)
+
+	#Saving
+
+	print('Saving', flush=True)
 
 	wb.save(pathdest)
+	finishLocalTimer = time.perf_counter()
+	finishGlobalTimer = time.perf_counter()
+	print(f'In total it took {round(finishGlobalTimer-startGlobalTimer, 2)} seconds')
+
+elif ValidationRegime == 2:
+	
+	vf.combiningWorkbooks(machAttsheetTitle, pathdest, path1, path2)
+	
+	#Loading
+
+	startLoadingTimer = time.perf_counter()
+	print('Starting to load', flush=True)
+	wb = load_workbook(filename=pathdest)
+	wbs0 = wb.worksheets[0]
+
+	wbs0.auto_filter.ref = wbs0.dimensions
+	wbs0.freeze_panes = 'A2'
+
+	finishLoadingTimer = time.perf_counter()
+	print(f'Loading finished in {round(finishLoadingTimer-startLoadingTimer, 3)} seconds', flush=True)
+
+
+
+	#Comparing
+
+
+	print('Comparing data', flush=True)
+	startCompareTimer = time.perf_counter()
+
+	vf.vlookupToLastCollumn(wbs0, 'Purpose', machAttsheetTitle, Purpose)
+	vf.vlookupToLastCollumn(wbs0, 'State', machAttsheetTitle, State)
+	vf.vlookupToLastCollumn(wbs0, 'ObjectType', machAttsheetTitle, ObjectType)
+	vf.vlookupToLastCollumn(wbs0, 'InFleetEndDate', machAttsheetTitle, InFleetEndDate)
+
+	finishCompareTimer = time.perf_counter()
+	print(f'Loading finished in {round(finishCompareTimer-startCompareTimer, 3)} seconds', flush=True)
+
+
+	#Validating
+
+	print('Validating', flush=True)
+	startValidatingTimer = time.perf_counter()
+
+	vf.searchForBlanks(wb, wbs0, valcol_a)
+	vf.searchForBlanks(wb, wbs0, valcol_b)
+	vf.searchForBlanks(wb, wbs0, valcol_c)
+	vf.searchForBlanks(wb, wbs0, valcol_d)
+	#vf.searchForBlanks(wb, wbs0, valcol_h)
+
+	finishValidatingTimer = time.perf_counter()
+	print(f'Validating finished in {round(finishValidatingTimer-startValidatingTimer, 3)} seconds', flush=True)
+
+	#Saving
+
+	print('Saving', flush=True)
+
+	wb.save(pathdest)
+	finishLocalTimer = time.perf_counter()
+	finishGlobalTimer = time.perf_counter()
+	print(f'In total it took {round(finishGlobalTimer-startGlobalTimer, 2)} seconds')
 
 
 elif ValidationRegime == 3:
+
+	#Loading
+
+	startLoadingTimer = time.perf_counter()
+	print('Starting to load', flush=True)
 	wb = load_workbook(filename=pathdest)
 	wbs0 = wb.worksheets[0]
 
-	wbs0.auto_filter.ref = wbs0.dimensions
-	wbs0.freeze_panes = 'A2' 	
+	finishLoadingTimer = time.perf_counter()
+	print(f'Loading finished in {round(finishLoadingTimer-startLoadingTimer, 3)} seconds', flush=True)
+
+
+
+	#Comparing
+
 
 	print('Comparing data', flush=True)
+	startCompareTimer = time.perf_counter()
 
 	vf.vlookupToLastCollumn(wbs0, 'Purpose', machAttsheetTitle, Purpose)
 	vf.vlookupToLastCollumn(wbs0, 'State', machAttsheetTitle, State)
 	vf.vlookupToLastCollumn(wbs0, 'ObjectType', machAttsheetTitle, ObjectType)
 	vf.vlookupToLastCollumn(wbs0, 'InFleetEndDate', machAttsheetTitle, InFleetEndDate)
 
+	finishCompareTimer = time.perf_counter()
+	print(f'Loading finished in {round(finishCompareTimer-startCompareTimer, 3)} seconds', flush=True)
+
+
+	#Validating
+
 	print('Validating', flush=True)
+	startValidatingTimer = time.perf_counter()
 
 	vf.searchForBlanks(wb, wbs0, valcol_a)
 	vf.searchForBlanks(wb, wbs0, valcol_b)
 	vf.searchForBlanks(wb, wbs0, valcol_c)
 	vf.searchForBlanks(wb, wbs0, valcol_d)
-	vf.searchForBlanks(wb, wbs0, valcol_e)
+	#vf.searchForBlanks(wb, wbs0, valcol_h)
 
+	finishValidatingTimer = time.perf_counter()
+	print(f'Validating finished in {round(finishValidatingTimer-startValidatingTimer, 3)} seconds', flush=True)
 
+	#Saving
 
+	print('Saving', flush=True)
 
+	wbs0.auto_filter.ref = wbs0.dimensions
+	wbs0.freeze_panes = 'A2'
 
 	wb.save(pathdest)
+	finishLocalTimer = time.perf_counter()
+	finishGlobalTimer = time.perf_counter()
+	print(f'In total it took {round(finishGlobalTimer-startGlobalTimer, 2)} seconds')
 
 
 
-
-
-	'''
-
-
-
-
-wb = load_workbook(filename=pathtest)
-wbs0 = wb.worksheets[0]
-vf.searchForBlanks(wb, wbs0, 'borst')
-
-#print(wbs0['C4'].value)
-
-wb.save(filename=pathtest) '''

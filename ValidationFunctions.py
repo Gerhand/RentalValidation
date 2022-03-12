@@ -56,6 +56,12 @@ def combiningWorkbooks(title, destination, header, second):
 
 	
 	sheetCopyPaste(wsh_0, wsdestination_1)
+	wbdestination.save(destination)
+	wbdestination.close()
+
+	wbdestination = load_workbook(filename=destination)
+	wsdestination_1 = wbdestination[str(title)]
+
 
 	list_to_append = list(rowMemory(ws2_0))
 	#print(list_to_append)
@@ -78,6 +84,7 @@ def searchForBlanks(wb, ws, header):
 		ws2.append((cell.value for cell in row))
 	check = 0
 
+
 	#Getting the header coordinates to check
 	for col in ws.columns:
 		column = get_column_letter(col[0].column)
@@ -88,9 +95,14 @@ def searchForBlanks(wb, ws, header):
 				#print(char)
 
 				#checking if the dedicated columm contains a irregularity and than copying the whole row
-				for row in ws.rows:
-					#print(str(row[0].row))
-					if ws[char + str(row[0].row)].value == 0 or ws[char + str(row[0].row)].value == None:
+				for row in ws:
+					#value = ws[char + str(row[0].row)].value
+					#coll = ws[char + str(row[0].row)]
+
+
+					#print(str(coll) + '  ' + str(value))
+
+					if ws[char + str(row[0].row)].value == 0 or ws[char + str(row[0].row)].value == None or ws[char + str(row[0].row)].value == " ":
 
 						#needed to add a dumb calculation to remove the sheet again. Could not make it work with searching for A1 as empty cell. 
 						check = check + 1
@@ -99,15 +111,17 @@ def searchForBlanks(wb, ws, header):
 
 
 #if there is no need we can delete the sheet again.
+
 	if check == 0:
-		print('There where no irregularities in ' + header)
+		print('There where no irregularities in ' + header, flush=True)
 		wb.remove_sheet(ws2)
 
 	elif check != 0:
-		print('There where irregularities in ' + header)
+		print('There where irregularities in ' + header, flush=True)
 		ws2.auto_filter.ref = ws2.dimensions
 		ws2.freeze_panes = 'A2' 
 		#i could optimise this to insert the headers here but yeah most of the times there will be issues here
+
 
 
 
