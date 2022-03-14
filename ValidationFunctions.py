@@ -29,7 +29,35 @@ def vlookupToLastCollumn(sheet, title, sheetname, formula):
 		i = i+1
 	sheet[char + '1'] = title
 
-	
+
+def searchForDuplicates(wb, ws, sheetname, header, baseheader):
+	ws2 = wb.worksheets[sheetname]
+
+	for col in ws2.columns:
+		column = get_column_letter(col[0].column)
+		#print(column)
+		for cell in col:
+			if str(cell.value) == str(header):
+				char = column
+
+	for col in ws.columns:
+		column = get_column_letter(col[0].column)
+		#print(column)
+		for cell in col:
+			if str(cell.value) == str(baseheader):
+				basechar = column
+
+				#=AANTAL.ALS(LoadFile!$AB$2:$AB$23204;B2)
+	charend = get_column_letter(ws2.max_column+1)
+	i = 1
+	for row in ws:
+		ws2[charend + str(i)] = "=COUNTIF(" + sheetname + "!" + basechar + str("2:") + basechar + str(ws2.max_row) + "," + char + str(i) + ")"
+		i = i+1
+	wb.save(path) 
+	#print('Searched for duplicates' + str(wbs0.max_row) + ' times', flush=True)
+
+
+
 
 def sheetCopyPaste(ws, destination):
 	for row in ws:
@@ -55,12 +83,9 @@ def combiningWorkbooks(title, destination, header, second):
 	wsdestination_1 = wbdestination.create_sheet(title)
 
 	
-	sheetCopyPaste(wsh_0, wsdestination_1)
-	wbdestination.save(destination)
-	wbdestination.close()
-
-	wbdestination = load_workbook(filename=destination)
-	wsdestination_1 = wbdestination[str(title)]
+	for row in wsh_0:
+		for cell in row:
+			wsdestination_1[cell.coordinate].value = cell.value
 
 
 	list_to_append = list(rowMemory(ws2_0))
@@ -108,6 +133,54 @@ def searchForBlanks(wb, ws, header):
 						check = check + 1
 						#print(ws[char+ str(row[0].row)])
 						ws2.append((cell.value for cell in row))
+
+
+#if there is no need we can delete the sheet again.
+
+	if check == 0:
+		print('There where no irregularities in ' + header, flush=True)
+		wb.remove_sheet(ws2)
+
+	elif check != 0:
+		print('There where irregularities in ' + header, flush=True)
+		ws2.auto_filter.ref = ws2.dimensions
+		ws2.freeze_panes = 'A2' 
+		#i could optimise this to insert the headers here but yeah most of the times there will be issues here
+
+
+
+def searchForValues(wb, ws, header):
+	ws2 = wb.create_sheet(header + " irregularities")
+	for row in ws.iter_rows(min_row=1, max_row=1):
+		ws2.append((cell.value for cell in row))
+	check = 0
+
+
+	#Getting the header coordinates to check
+	for col in ws.columns:
+		column = get_column_letter(col[0].column)
+		#print(column)
+		for cell in col:
+			if str(cell.value) == str(header):
+				char = column
+				#print(char)
+
+				#checking if the dedicated columm contains a irregularity and than copying the whole row
+				for row in ws:
+					#value = ws[char + str(row[0].row)].value
+					#coll = ws[char + str(row[0].row)]
+
+
+					#print(str(coll) + '  ' + str(value))
+
+					if ws[char + str(row[0].row)].value:
+
+						#needed to add a dumb calculation to remove the sheet again. Could not make it work with searching for A1 as empty cell. 
+						check = check + 1
+						#print(ws[char+ str(row[0].row)])
+						ws2.append((cell.value for cell in row))
+					else:
+						continue
 
 
 #if there is no need we can delete the sheet again.
