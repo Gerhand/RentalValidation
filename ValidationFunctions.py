@@ -26,35 +26,62 @@ def vlookupToLastCollumn(sheet, title, sheetname, formula):
 	for row in sheet:
 		#sheet[char + str(i)] = "=VLOOKUP(AB2,'Machines + Attachments'!B:S,10,FALSE)"
 		sheet[char + str(i)] = "=VLOOKUP(AB" + str(i) + ",'" + sheetname + formula
+		#print(char + str(i), flush=True)
 		i = i+1
 	sheet[char + '1'] = title
 
 
-def searchForDuplicates(wb, ws, sheetname, header, baseheader):
-	ws2 = wb.worksheets[sheetname]
+def searchForDuplicates(wb, ws, sheetname, sheetnamenumber, header, baseheader):
+	ws2 = wb.worksheets[sheetnamenumber]
+
+
 
 	for col in ws2.columns:
 		column = get_column_letter(col[0].column)
 		#print(column)
 		for cell in col:
 			if str(cell.value) == str(header):
+				global char
 				char = column
+				continue
+
+	#print(char, flush=True)
 
 	for col in ws.columns:
 		column = get_column_letter(col[0].column)
 		#print(column)
 		for cell in col:
 			if str(cell.value) == str(baseheader):
+				global basechar 
 				basechar = column
+				continue
 
-				#=AANTAL.ALS(LoadFile!$AB$2:$AB$23204;B2)
+	#print(basechar, flush=True)
+
+						#=AANTAL.ALS(LoadFile!$AB$2:$AB$23204;B2)
+
+
 	charend = get_column_letter(ws2.max_column+1)
+	maxrow = str(ws.max_row)
+
 	i = 1
-	for row in ws:
-		ws2[charend + str(i)] = "=COUNTIF(" + sheetname + "!" + basechar + str("2:") + basechar + str(ws2.max_row) + "," + char + str(i) + ")"
+	'''
+	while i < ws.max_row:
+		ws2[charend + str(i)] = "=COUNTIF(" + sheetname + "!" + basechar + str("2:") + basechar + maxrow + "," + char + str(i) + ")"
+		print(charend + str(i), flush=True)
 		i = i+1
-	wb.save(path) 
-	#print('Searched for duplicates' + str(wbs0.max_row) + ' times', flush=True)
+
+	'''
+	for row in ws2.iter_rows():
+		ws2[charend + str(i)] = "=COUNTIF(" + sheetname + "!" + basechar + str("2:") + basechar + maxrow + "," + char + str(i) + ")"
+		print(charend + str(i), flush=True)
+	
+		i = i+1
+
+
+	#wb.save(path) 
+	print('Searched for duplicates' + maxrow + ' times', flush=True)
+	ws[basechar + '1'] = 'Duplicates ' + header
 
 
 

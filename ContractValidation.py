@@ -22,7 +22,7 @@ path2 = 'FileBucket\\ATT.xlsx'
 pathdest = 'FileBucket\\RentalContract1.xlsx'
 #pathtest = 'FileBucket\\test.xlsx'
 #pathtest2 = 'FileBucket\\test2.xlsx'
-#pathtestdest = 'FileBucket\\dest.xlsx'
+pathtestdest = 'FileBucket\\dest.xlsx'
 
 test1 = 'C:\\Users\\Gert\\Documents\\Development\\excellekes\\1.xlsx'
 test2 = 'C:\\Users\\Gert\\Documents\\Development\\excellekes\\2.xlsx'
@@ -55,7 +55,6 @@ valcol_l = 'InFleetEndDate'
 
 
 
-"""
 
 
 ValidationRegime = int(input('What kind of validation do you want? 1 = Full, 2 = Combining and validation, 3 = File Validation only\n'))
@@ -133,6 +132,9 @@ if ValidationRegime == 1:
 	vf.searchForBlanks(wb, wbs0, valcol_k)
 	vf.searchForValues(wb, wbs0, valcol_l)
 
+	vf.searchForDuplicates(wb, wbs0, 'LoadFile', 1, 'objectId', 'AssignMachineNo')
+
+
 	finishValidatingTimer = time.perf_counter()
 	print(f'Validating finished in {round(finishValidatingTimer-startValidatingTimer, 3)} seconds', flush=True)
 
@@ -209,6 +211,9 @@ elif ValidationRegime == 2:
 	vf.searchForBlanks(wb, wbs0, valcol_k)
 	vf.searchForValues(wb, wbs0, valcol_l)
 
+	vf.searchForDuplicates(wb, wbs0, 'LoadFile', 1, 'objectId', 'AssignMachineNo')
+
+
 	finishValidatingTimer = time.perf_counter()
 	print(f'Validating finished in {round(finishValidatingTimer-startValidatingTimer, 3)} seconds', flush=True)
 
@@ -273,6 +278,9 @@ elif ValidationRegime == 3:
 	vf.searchForBlanks(wb, wbs0, valcol_k)
 	vf.searchForValues(wb, wbs0, valcol_l)
 
+	vf.searchForDuplicates(wb, wbs0, 'LoadFile', 1, 'objectId', 'AssignMachineNo')
+
+
 
 	finishValidatingTimer = time.perf_counter()
 	print(f'Validating finished in {round(finishValidatingTimer-startValidatingTimer, 3)} seconds', flush=True)
@@ -290,11 +298,14 @@ elif ValidationRegime == 3:
 	print(f'In total it took {round(finishGlobalTimer-startGlobalTimer, 2)} seconds')
 
 
-"""
-
+'''
 wb = load_workbook(filename=pathdest)
 wbs0 = wb.worksheets[0]
+print('Duplicate searching', flush=True)
 
-vf.searchForDuplicates(wb, wbs0, 'LoadFile', 'objectId', 'AssignMachineNo')
+vf.vlookupToLastCollumn(wbs0, 'Purpose', machAttsheetTitle, Purpose)
 
+vf.searchForDuplicates(wb, wbs0, 'LoadFile', 1, 'objectId', 'AssignMachineNo')
+print('Saving', flush=True)
 wb.save(pathdest)
+'''
