@@ -81,7 +81,7 @@ def searchForDuplicates(wb, ws, sheetname, sheetnamenumber, header, baseheader):
 
 	#wb.save(path) 
 	print('Searched for duplicates' + maxrow + ' times', flush=True)
-	ws[basechar + '1'] = 'Duplicates ' + header
+	ws2[basechar + '1'] = 'Duplicates ' + header
 
 
 
